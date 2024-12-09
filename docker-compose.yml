@@ -1,0 +1,6 @@
+﻿services:
+  paymentpointfinder.web:
+    image: paymentpointfinder.web
+    build:
+      context: .
+      dockerfile: PaymentPointFinder.Web/Dockerfile
