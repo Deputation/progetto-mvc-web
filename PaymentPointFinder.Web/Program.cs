@@ -1,3 +1,6 @@
+using PaymentPointFinder.Web.Services;
+using PaymentPointFinder.Web.Services.Interfaces;
+
 namespace PaymentPointFinder.Web;
 
 public class Program
@@ -8,6 +11,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+        builder.Services.AddHttpClient<IPaymentPointRestService, PaymentPointRestService>();
 
         var app = builder.Build();
 
