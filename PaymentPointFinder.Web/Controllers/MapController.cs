@@ -21,7 +21,7 @@ public class MapController : Controller
             Points = await _paymentPointRestService.FetchPaymentPoints(),
             DefaultLatitude = 45.4641,
             DefaultLongitude = 9.1919,
-            DefaultZoom = 100
+            DefaultZoom = 15
         };
         
         return View(model);
