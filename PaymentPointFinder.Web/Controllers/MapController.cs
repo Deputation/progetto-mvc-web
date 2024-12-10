@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PaymentPointFinder.Web.Models;
-using PaymentPointFinder.Web.Services.Interfaces;
+using PaymentPointFinder.Core.Services.Interfaces;
 
 namespace PaymentPointFinder.Web.Controllers;
 

@@ -1,5 +1,5 @@
-using PaymentPointFinder.Web.Services;
-using PaymentPointFinder.Web.Services.Interfaces;
+using PaymentPointFinder.Core.Services;
+using PaymentPointFinder.Core.Services.Interfaces;
 
 namespace PaymentPointFinder.Web;
 

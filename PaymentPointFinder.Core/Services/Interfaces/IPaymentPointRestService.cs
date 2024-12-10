@@ -1,6 +1,6 @@
 using PaymentPointFinder.Core.Models;
 
-namespace PaymentPointFinder.Web.Services.Interfaces;
+namespace PaymentPointFinder.Core.Services.Interfaces;
 
 public interface IPaymentPointRestService
 {

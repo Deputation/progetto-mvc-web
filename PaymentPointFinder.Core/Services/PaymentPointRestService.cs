@@ -1,9 +1,11 @@
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using PaymentPointFinder.Core.Models;
-using PaymentPointFinder.Web.Services.Interfaces;
+using PaymentPointFinder.Core.Services.Interfaces;
 
-namespace PaymentPointFinder.Web.Services;
+namespace PaymentPointFinder.Core.Services;
 
 public class PaymentPointRestService : IPaymentPointRestService
 {
