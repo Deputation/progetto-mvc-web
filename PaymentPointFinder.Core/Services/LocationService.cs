@@ -40,6 +40,15 @@ namespace PaymentPointFinder.Core.Services
         
         public async Task<List<PaymentPoint>> GetNearbyPoints(double lat, double lng, double radius)
         {
+            if (radius <= 0)
+                throw new ArgumentException("Radius must be greater than zero", nameof(radius));
+
+            if (lat < -90 || lat > 90)
+                throw new ArgumentException("Latitude must be between -90 and 90 degrees", nameof(lat));
+
+            if (lng < -180 || lng > 180)
+                throw new ArgumentException("Longitude must be between -180 and 180 degrees", nameof(lng));
+
             var nearbyPoints = new List<PaymentPoint>();
 
             foreach (var point in await _paymentPointRestService.FetchPaymentPoints())
