@@ -2,6 +2,7 @@
 using PaymentPointFinder.Core.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Reflection.Metadata;
@@ -12,7 +13,11 @@ namespace PaymentPointFinder.Core.Services
 {
     public class LocationService : ILocationService
     {
-        public LocationService() { }
+        private readonly IPaymentPointRestService _paymentPointRestService;
+        public LocationService(IPaymentPointRestService paymentPointRestService) 
+        {
+            _paymentPointRestService = paymentPointRestService ?? throw new ArgumentException(nameof(paymentPointRestService));
+        }
         
         private static double CalculateDistance(double lat1, double lng1, double lat2, double lng2)
         {
@@ -33,9 +38,19 @@ namespace PaymentPointFinder.Core.Services
                                (1 - Math.Cos(deltaLng))) / 2.0));
         }
         
-        public Task<List<PaymentPoint>> GetNearbyPoints(double lat, double lng, double radius)
+        public async Task<List<PaymentPoint>> GetNearbyPoints(double lat, double lng, double radius)
         {
-            throw new NotImplementedException();
+            var nearbyPoints = new List<PaymentPoint>();
+
+            foreach (var point in await _paymentPointRestService.FetchPaymentPoints())
+            {
+                if (CalculateDistance(point.YWGS84, point.xWGS84, lat, lng) <= radius)
+                {
+                    nearbyPoints.Add(point);
+                }
+            }
+            
+            return nearbyPoints;
         }
     }
 }

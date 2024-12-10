@@ -12,6 +12,7 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
         builder.Services.AddHttpClient<IPaymentPointRestService, PaymentPointRestService>();
+        builder.Services.AddScoped<ILocationService, LocationService>();
 
         var app = builder.Build();
 
