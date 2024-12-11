@@ -14,8 +14,12 @@
 
 <style>
     #map {
-        width:  800px;
+        width: 800px;
         height: 800px;
+    }
+
+    .selected-marker-icon {
+        filter: hue-rotate(90deg);
     }
 </style>
 
@@ -27,32 +31,107 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-    var lat = @Model.DefaultLatitude;
-    var long = @Model.DefaultLongitude;
-    var zoom = @Model.DefaultZoom;
-    var points = @Json.Serialize(Model.Points);
-    var map = L.map('map').setView([lat, long], zoom);
+    let map = null;
+    let userMarker = null;
+    let selectedMarker = null;
+    let distanceSegment = null;
+    let popup = null;
 
-    points.forEach((point) => {
-        L.marker([point.YWGS84, point.xWGS84]).bindTooltip(point.DENOM + ' - ' + point.SOTTOCAT, {
+    function defaultIcon() {
+        return new L.Icon.Default();
+    }
+
+    function selectedIcon() {
+        return new L.Icon.Default({ className: 'selected-marker-icon' });
+    }
+
+    function cleanupDistanceWidgets() {
+        if (distanceSegment) {
+            map.removeLayer(distanceSegment);
+        }
+
+        if (popup) {
+            map.removeLayer(popup);
+        }
+    }
+
+    function displayDistance() {
+        if (userMarker && selectedMarker) {
+            cleanupDistanceWidgets();
+
+            let userLatLng = userMarker.getLatLng();
+            let selectedLatLng = selectedMarker.getLatLng();
+
+            distanceSegment = L.polyline([userLatLng, selectedLatLng],
+                { color: 'blue', weight: 2, dashArray: '8, 12' }).addTo(map);
+
+            var popupPosition = L.latLng(
+                (userLatLng.lat + selectedLatLng.lat) / 2,
+                (userLatLng.lng + selectedLatLng.lng) / 2
+            );
+
+            popup = L.popup({ closeButton: false }).setLatLng(popupPosition)
+                .setContent(`Distanza: ${(map.distance(userLatLng, selectedLatLng) / 1000).toFixed(3)} km`)
+                .addTo(map);
+        }
+    }
+
+    function setupPaymentPoint(point) {
+        let marker = L.marker([point.YWGS84, point.xWGS84]).bindTooltip(point.DENOM + ' - ' + point.SOTTOCAT, {
             direction: 'top',
             offset: [-15, -10],
             permanent: false,
         }).addTo(map);
-    });
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+        marker.paymentPointData = point;
 
-    var lastMarker = null;
+        marker.on('click', function (e) {
+            // Change the old one's icon
+            if (selectedMarker != null) {
+                selectedMarker.setIcon(defaultIcon());
+            }
 
-    map.on('dblclick', function (e) {
-        if (lastMarker) {
-            map.removeLayer(lastMarker);
-        }
-        lastMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+            selectedMarker = marker;
+            selectedMarker.setIcon(selectedIcon());
 
-    });
+            displayDistance();
+        });
+    }
+
+    function loadMap() {
+        let lat = @Model.DefaultLatitude;
+        let long = @Model.DefaultLongitude;
+        let zoom = @Model.DefaultZoom;
+        let points = @Json.Serialize(Model.Points);
+        map = L.map('map').setView([lat, long], zoom);
+
+        points.forEach(setupPaymentPoint);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+    }
+
+    function setupUserMarker() {
+        userMarker = null;
+
+        map.on('dblclick', function (e) {
+            if (userMarker) {
+                map.removeLayer(userMarker);
+            }
+
+            userMarker = L.marker([e.latlng.lat, e.latlng.lng])
+                .on('click', function (e) {
+                    map.removeLayer(userMarker);
+                    userMarker = null;
+                    cleanupDistanceWidgets();
+                }).addTo(map);
+
+            displayDistance();
+        });
+    }
+
+    loadMap();
+    setupUserMarker();
 </script>
