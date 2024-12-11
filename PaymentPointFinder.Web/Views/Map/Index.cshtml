@@ -45,4 +45,14 @@
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
+
+    var lastMarker = null;
+
+    map.on('dblclick', function (e) {
+        if (lastMarker) {
+            map.removeLayer(lastMarker);
+        }
+        lastMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+
+    });
 </script>
