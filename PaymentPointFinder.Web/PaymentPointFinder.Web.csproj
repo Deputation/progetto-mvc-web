@@ -20,6 +20,7 @@
     <ItemGroup>
       <PackageReference Include="CoreWCF.Http" Version="1.6.0" />
       <PackageReference Include="CoreWCF.Primitives" Version="1.6.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     </ItemGroup>
 
 </Project>

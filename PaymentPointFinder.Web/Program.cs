@@ -1,6 +1,7 @@
 using CoreWCF;
 using CoreWCF.Configuration;
 using CoreWCF.Description;
+using Microsoft.OpenApi.Models;
 using PaymentPointFinder.Core.Services;
 using PaymentPointFinder.Core.Services.Interfaces;
 using PaymentPointFinder.Services.Interfaces;
@@ -49,6 +50,16 @@ public class Program
         builder.Services.AddServiceModelMetadata();
         builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();
 
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "PaymentPointFinder API",
+                Version = "v1"
+            });
+        });
+        
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -61,6 +72,12 @@ public class Program
         
         ConfigureSoapEndpoints(app);
 
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaymentPointFinder API");
+        });
+        
         app.UseHttpsRedirection();
         app.UseStaticFiles();
 
