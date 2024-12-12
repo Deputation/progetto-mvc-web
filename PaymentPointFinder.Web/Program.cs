@@ -4,6 +4,7 @@ using CoreWCF.Description;
 using PaymentPointFinder.Core.Services;
 using PaymentPointFinder.Core.Services.Interfaces;
 using PaymentPointFinder.Services.Interfaces;
+using System.Globalization;
 
 namespace PaymentPointFinder.Web;
 
@@ -29,6 +30,10 @@ public class Program
     }
     public static void Main(string[] args)
     {
+        var cultureInfo = CultureInfo.InvariantCulture;
+        CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+        CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.

@@ -2,7 +2,18 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container text-center mt-5">
+    <h1 class="display-3 text-primary">Benvenuto nel nostro portale!</h1>
+    <p class="lead mt-4">Esplora i nostri servizi e scopri come possiamo esserti utili.</p>
+    <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="Map" class="btn btn-outline-success btn-lg">
+            Scopri la mappa dei punti di pagamento
+        </a>
+        <a href="~/PaymentPointService.svc?wsdl" class="btn btn-outline-primary btn-lg">
+            Accedi ai nostri servizi SOAP
+        </a>
+        <a href="~/swagger" class="btn btn-outline-warning btn-lg">
+            Esplora la documentazione Swagger
+        </a>
+    </div>
 </div>
