@@ -17,4 +17,9 @@
       <ProjectReference Include="..\PaymentPointFinder.Core\PaymentPointFinder.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CoreWCF.Http" Version="1.6.0" />
+      <PackageReference Include="CoreWCF.Primitives" Version="1.6.0" />
+    </ItemGroup>
+
 </Project>
