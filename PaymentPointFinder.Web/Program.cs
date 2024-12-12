@@ -33,6 +33,10 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+        
+        builder.Services.AddMemoryCache();
+        builder.Services.AddSingleton<IPaymentPointCacheService, PaymentPointCacheService>();
+        
         builder.Services.AddHttpClient<IPaymentPointRestService, PaymentPointRestService>();
         builder.Services.AddScoped<ILocationService, LocationService>();
         builder.Services.AddScoped<IPaymentPointSoapService, PaymentPointSoapService>();

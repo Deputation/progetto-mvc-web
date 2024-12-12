@@ -12,12 +12,19 @@ public class PaymentPointRestService : IPaymentPointRestService
     private readonly HttpClient _httpClient;
     private readonly ILogger<PaymentPointRestService> _logger;
     private readonly string _baseUrl;
+    private readonly IPaymentPointCacheService _paymentPointCacheService;
 
-    public PaymentPointRestService(HttpClient httpClient, ILogger<PaymentPointRestService> logger, IConfiguration configuration)
+    public PaymentPointRestService(HttpClient httpClient,
+        ILogger<PaymentPointRestService> logger,
+        IPaymentPointCacheService paymentPointCacheService,
+        IConfiguration configuration)
     {
         _httpClient = httpClient;
         _logger = logger;
-        _baseUrl = configuration["PaymentPointsApi:BaseUrl"] ?? throw new ArgumentException("PaymentPointsApi:BaseUrl not configured");
+        _paymentPointCacheService = paymentPointCacheService ??
+                                    throw new ArgumentNullException(nameof(paymentPointCacheService));
+        _baseUrl = configuration["PaymentPointsApi:BaseUrl"] ??
+                   throw new ArgumentException("PaymentPointsApi:BaseUrl not configured");
     }
 
     private string RenameJsonField(string jsonArrayString, string oldFieldName, string newFieldName)
@@ -36,33 +43,49 @@ public class PaymentPointRestService : IPaymentPointRestService
                     jsonWriter.WritePropertyName(name);
                     property.Value.WriteTo(jsonWriter);
                 }
+
                 jsonWriter.WriteEndObject();
             }
+
             jsonWriter.WriteEndArray();
         }
+
         return Encoding.UTF8.GetString(writer.ToArray());
     }
-    
+
+    private async Task<List<PaymentPoint>> FetchPaymentPointsFromApi()
+    {
+        var response = await _httpClient.GetAsync(_baseUrl);
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        // This resolves a naming collision.
+        content = RenameJsonField(content, "XWGS84", "XWGS84String");
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = false
+        };
+
+        var points = JsonSerializer.Deserialize<List<PaymentPoint>>(content, options);
+        
+        return points ?? throw new HttpRequestException("Could not source API data");
+    }
+
     public async Task<List<PaymentPoint>> FetchPaymentPoints()
     {
         try
         {
-            var response = await _httpClient.GetAsync(_baseUrl);
-            response.EnsureSuccessStatusCode();
-            
-            var content = await response.Content.ReadAsStringAsync();
-            
-            // This resolves a naming collision.
-            content = RenameJsonField(content, "XWGS84", "XWGS84String");
-            
-            var options = new JsonSerializerOptions
+            if (!_paymentPointCacheService.NeedsRefresh())
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                PropertyNameCaseInsensitive = false
-            };
+                return _paymentPointCacheService.GetPoints()!;
+            }
 
-            var points = JsonSerializer.Deserialize<List<PaymentPoint>>(content, options);
-            return points ?? new List<PaymentPoint>();
+            var points = await FetchPaymentPointsFromApi();
+            _paymentPointCacheService.SetPoints(points);
+            return points;
         }
         catch (Exception ex)
         {
