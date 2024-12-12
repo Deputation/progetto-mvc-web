@@ -21,10 +21,24 @@
     .selected-marker-icon {
         filter: hue-rotate(90deg);
     }
+    
+    #payment-point-info {
+        top: 10px;
+        right:  10px;
+        position: absolute;
+        z-index: 1000;
+        background-color: rgba(242, 242, 242, 0.8);
+        padding: 10px;
+        border-radius: 5px;
+    }
 </style>
 
 <div class="d-flex justify-content-center">
-    <div id="map"></div>
+    <div id="map">
+        <div id="payment-point-info" class="d-none">
+            <div id="payment-point-info-text"></div>
+        </div>
+    </div>
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -36,6 +50,20 @@
     let selectedMarker = null;
     let distanceSegment = null;
     let popup = null;
+
+    function showPaymentPointInfo(data) {
+        document.getElementById('payment-point-info-text').innerHTML = `
+            <strong>${data.DENOM}</strong><br>
+            Categoria: ${data.SOTTOCAT}<br>
+            Indirizzo: ${data.INDIRIZZO}<br>
+            CAP: ${data.CAP}<br>
+            ${data.SERVIZIO ? `Servizio: ${data.SERVIZIO}<br>` : ``}
+            ${data.BRAND ? `Brand: ${data.BRAND}<br>` : ``}
+            ${data.LINK ? `Sito: <a target="_blank" href=${data.LINK}>${data.LINK}</a><br>` : ``}
+        `;
+        
+        document.getElementById('payment-point-info').classList.remove("d-none");
+    }
 
     function defaultIcon() {
         return new L.Icon.Default();
@@ -94,6 +122,8 @@
             selectedMarker = marker;
             selectedMarker.setIcon(selectedIcon());
 
+            showPaymentPointInfo(marker.paymentPointData);
+            
             displayDistance();
         });
     }
