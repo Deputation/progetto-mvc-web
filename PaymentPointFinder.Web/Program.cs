@@ -17,7 +17,7 @@ public class Program
         {
             serviceBuilder.AddService<PaymentPointSoapService>(serviceOptions =>
             {
-                serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
+                serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = app.Environment.IsDevelopment();
             });
         
             serviceBuilder.AddServiceEndpoint<PaymentPointSoapService, IPaymentPointSoapService>(

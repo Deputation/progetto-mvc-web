@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PaymentPointFinder.Core.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http.HttpResults;
+using PaymentPointFinder.Core.Models;
+using PaymentPointFinder.Web.Models.Api;
 
 namespace PaymentPointFinder.Web.Controllers
 {
@@ -17,8 +20,8 @@ namespace PaymentPointFinder.Web.Controllers
         }
 
         [HttpGet("nearby-points")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(List<PaymentPoint>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetNearbyPoints([Range(-90, 90)] double lat, [Range(-180, 180)] double lng, [Range(0.1, 100)] double radius)
         {
             try
@@ -28,9 +31,9 @@ namespace PaymentPointFinder.Web.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new
+                return BadRequest(new ErrorResponse
                 {
-                    error = ex.Message,
+                    Error = ex.Message,
                 });
             }
         }

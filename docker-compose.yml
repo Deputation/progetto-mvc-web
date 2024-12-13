@@ -4,3 +4,5 @@
     build:
       context: .
       dockerfile: PaymentPointFinder.Web/Dockerfile
+    ports:
+      - "8080:8080"
