@@ -11,11 +11,9 @@ namespace PaymentPointFinder.Web.Controllers
     [ApiController]
     public class PaymentPointApiController : ControllerBase
     {
-        private readonly IPaymentPointRestService _paymentPointRestService;
         private readonly ILocationService _locationService;
-        public PaymentPointApiController(IPaymentPointRestService paymentPointRestService, ILocationService locationService)
+        public PaymentPointApiController(ILocationService locationService)
         {
-            _paymentPointRestService = paymentPointRestService ?? throw new ArgumentException(nameof(paymentPointRestService));
             _locationService = locationService ?? throw new ArgumentException(nameof(locationService));
         }
 

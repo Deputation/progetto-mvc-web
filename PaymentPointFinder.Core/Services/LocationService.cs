@@ -41,17 +41,18 @@ namespace PaymentPointFinder.Core.Services
             if (lng < -180 || lng > 180)
                 throw new ArgumentException("Longitude must be between -180 and 180 degrees", nameof(lng));
 
-            var nearbyPoints = new List<PaymentPoint>();
-
-            foreach (var point in await _paymentPointRestService.FetchPaymentPoints())
-            {
-                if (CalculateDistance(point.YWGS84, point.xWGS84, lat, lng) <= radius)
-                {
-                    nearbyPoints.Add(point);
-                }
-            }
-            
-            return nearbyPoints;
+            var points = await _paymentPointRestService.FetchPaymentPoints();
+    
+            return points
+                .Select(point => new 
+                { 
+                    Point = point, 
+                    Distance = CalculateDistance(point.YWGS84, point.xWGS84, lat, lng) 
+                })
+                .Where(x => x.Distance <= radius)
+                .OrderBy(x => x.Distance)
+                .Select(x => x.Point)
+                .ToList();
         }
     }
 }

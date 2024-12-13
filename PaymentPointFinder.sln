@@ -5,6 +5,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{75401D09-A669-41ED-BA38-5A70921B81F7}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentPointFinder.Core", "PaymentPointFinder.Core\PaymentPointFinder.Core.csproj", "{4A098917-8FA5-4880-9495-0F5DEF6B7FAD}"
